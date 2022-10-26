@@ -71,10 +71,12 @@ bool LeftJoinTest()
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}}};
         df::DataFrame<int, std::string> df2(data2);
-        df::DataFrame<int, std::string> df3 = df.join(df2, df::column_set{"id"}, df::JoinTypes::LEFT);
+        df::DataFrame<int, std::string> df3 = df.join(df2, df::column_set{"id"}, df::JoinTypes::INNER);
         bool teste1 = (df3.getRows() == 10);
         bool teste2 = (df3.getCols() == 3);
-        bool teste3 = boost::get<std::string>(df3.get(0,2)) == "a";
+        boost::variant<int, std::string> var = df3.get(0, 2);
+        std::string val = boost::get<std::string>(var);
+        bool teste3 = val == "a";
         return teste1 && teste2 && teste3;
     }
     catch (std::exception &e)

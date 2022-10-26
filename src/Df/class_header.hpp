@@ -49,7 +49,7 @@ namespace df
         DataFrame<T...> select(std::string_view column);
         DataFrame<T...> find(std::string_view column, const T &...value);
         DataFrame<T...> join(const DataFrame<T...> &df, const column_set &columns, JoinTypes type);
-        boost::variant<T...> get(const int& row,const int& col);
+        boost::variant<T...> get(const int& row,int col);
         void load(const data_map<T...> &data);
         void load(const data_vec<T...> &data);
         void load_csv(std::string_view path, const char &delimiter);

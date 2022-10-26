@@ -119,21 +119,19 @@ namespace df
     DataFrame<T...> DataFrame<T...>::join(const DataFrame<T...> &df, const column_set &columns, JoinTypes joinType)
     {
         DataFrame<T...> newDf;
+        newDf.cols = this->cols+df.cols-columns.size();
+        newDf.columns = this->columns;
+        newDf.columns.insert(df.columns.begin(), df.columns.end());
         switch (joinType)
         {
         case JoinTypes::INNER:
-            for (auto it = this->data.begin(); it != this->data.end(); it++)
-            {
-                if (df.data.find(it->first) != df.data.end())
-                {
-                    newDf.data[it->first] = con::vector<boost::variant<T...>>();
-                }
-            }
+            newDf.data = this->data;
             for (auto it = df.data.begin(); it != df.data.end(); it++)
             {
                 if (this->data.find(it->first) != this->data.end())
                 {
                     newDf.data[it->first] = con::vector<boost::variant<T...>>();
+                    newDf.data[it->first].reserve(this->rows);
                 }
             }
             for (int i = 0; i < this->rows; i++)
@@ -171,12 +169,14 @@ namespace df
             for (auto it = this->data.begin(); it != this->data.end(); it++)
             {
                 newDf.data[it->first] = con::vector<boost::variant<T...>>();
+                newDf.data[it->first].reserve(this->rows + df.rows);
             }
             for (auto it = df.data.begin(); it != df.data.end(); it++)
             {
                 if (this->data.find(it->first) != this->data.end())
                 {
                     newDf.data[it->first] = con::vector<boost::variant<T...>>();
+                    newDf.data[it->first].reserve(this->rows + df.rows);
                 }
             }
             for (int i = 0; i < this->rows; i++)
@@ -231,9 +231,17 @@ namespace df
         return newDf;
     }
     template<typename ...T>
-    boost::variant<T...> DataFrame<T...>::get(const int& row,const int& col)
+    boost::variant<T...> DataFrame<T...>::get(const int& row,int col)
     {
-        return this->data.at(this->columns[col])[row];
+        for(auto it = this->data.begin();it!=this->data.end();it++)
+        {
+            if(col==1)
+            {
+                return it->second[row];
+            }
+            col--;
+        }
+        throw std::out_of_range("Column out of range");
     }
 }
 #endif
