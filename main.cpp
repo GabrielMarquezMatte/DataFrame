@@ -1,4 +1,6 @@
+#define USE_BOOST
 #include "Df/DataFrame.hpp"
+#include <chrono>
 bool SelectTest()
 {
     try
@@ -71,12 +73,15 @@ bool LeftJoinTest()
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}}};
         df::DataFrame<int, std::string> df2(data2);
-        df::DataFrame<int, std::string> df3 = df.join(df2, df::column_set{"id"}, df::JoinTypes::INNER);
+        df::DataFrame<int, std::string> df3 = df.join(df2, df::column_set{"id"}, df::JoinTypes::LEFT);
+        df::data_map<int,std::string> data3 = {
+            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
+            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}},
+            {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}}};
+        df::DataFrame<int, std::string> df4(data3);
         bool teste1 = (df3.getRows() == 10);
         bool teste2 = (df3.getCols() == 3);
-        boost::variant<int, std::string> var = df3.get(0, 2);
-        std::string val = boost::get<std::string>(var);
-        bool teste3 = val == "a";
+        bool teste3 = (df3 == df4);
         return teste1 && teste2 && teste3;
     }
     catch (std::exception &e)
@@ -86,6 +91,7 @@ bool LeftJoinTest()
 }
 int main()
 {
+    std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
     if (SelectTest())
     {
         std::cout << "Test 1 passed\n";
@@ -110,7 +116,7 @@ int main()
     {
         std::cout << "Test 3 failed\n";
     }
-    if(LeftJoinTest())
+    if (LeftJoinTest())
     {
         std::cout << "Test 4 passed\n";
     }
@@ -118,5 +124,7 @@ int main()
     {
         std::cout << "Test 4 failed\n";
     }
+    std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << " microseconds" << std::endl;
     return 0;
 }

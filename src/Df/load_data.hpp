@@ -59,6 +59,7 @@ namespace df{
         }
         file.close();
     }
+    #ifdef USE_BOOST
     template <typename... T>
     void DataFrame<T...>::load_csv(const fs::path &path, const char &delimiter)
     {
@@ -91,6 +92,7 @@ namespace df{
         }
         file.close();
     }
+    #endif
     #pragma endregion
 }
 #endif

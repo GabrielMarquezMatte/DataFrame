@@ -31,7 +31,7 @@ namespace df
             {
                 columns.insert(it->first);
                 cols++;
-                newDf.data[it->first] = con::vector<boost::variant<T...>>();
+                newDf.data[it->first] = series<T...>();
             }
             newDf.data[it->first].reserve(new_rows);
         }
@@ -119,7 +119,7 @@ namespace df
     DataFrame<T...> DataFrame<T...>::join(const DataFrame<T...> &df, const column_set &columns, JoinTypes joinType)
     {
         DataFrame<T...> newDf;
-        newDf.cols = this->cols+df.cols-columns.size();
+        newDf.cols = this->cols + df.cols - columns.size();
         newDf.columns = this->columns;
         newDf.columns.insert(df.columns.begin(), df.columns.end());
         switch (joinType)
@@ -130,7 +130,7 @@ namespace df
             {
                 if (this->data.find(it->first) != this->data.end())
                 {
-                    newDf.data[it->first] = con::vector<boost::variant<T...>>();
+                    newDf.data[it->first] = series<T...>();
                     newDf.data[it->first].reserve(this->rows);
                 }
             }
@@ -168,14 +168,14 @@ namespace df
         case JoinTypes::LEFT:
             for (auto it = this->data.begin(); it != this->data.end(); it++)
             {
-                newDf.data[it->first] = con::vector<boost::variant<T...>>();
+                newDf.data[it->first] = series<T...>();
                 newDf.data[it->first].reserve(this->rows + df.rows);
             }
             for (auto it = df.data.begin(); it != df.data.end(); it++)
             {
                 if (this->data.find(it->first) != this->data.end())
                 {
-                    newDf.data[it->first] = con::vector<boost::variant<T...>>();
+                    newDf.data[it->first] = series<T...>();
                     newDf.data[it->first].reserve(this->rows + df.rows);
                 }
             }
@@ -220,7 +220,11 @@ namespace df
                         }
                         else
                         {
+                            #ifdef USE_BOOST
                             it->second.push_back(boost::variant<T...>());
+                            #else
+                            it->second.push_back(std::variant<T...>());
+                            #endif
                         }
                     }
                     newDf.rows++;
@@ -230,18 +234,57 @@ namespace df
         }
         return newDf;
     }
-    template<typename ...T>
-    boost::variant<T...> DataFrame<T...>::get(const int& row,int col)
+    #ifdef USE_BOOST
+    template <typename... T>
+    boost::variant<T...> DataFrame<T...>::get(const int &row, int col)
     {
-        for(auto it = this->data.begin();it!=this->data.end();it++)
+        for (auto it = this->data.begin(); it != this->data.end(); it++)
         {
-            if(col==1)
+            if (col == 0)
             {
                 return it->second[row];
             }
             col--;
         }
         throw std::out_of_range("Column out of range");
+    }
+    #else
+    template <typename... T>
+    std::variant<T...> DataFrame<T...>::get(const int &row, int col)
+    {
+        for (auto it = this->data.begin(); it != this->data.end(); it++)
+        {
+            if (col == 0)
+            {
+                return it->second[row];
+            }
+            col--;
+        }
+        throw std::out_of_range("Column out of range");
+    }
+    #endif
+    template <typename... T>
+    bool DataFrame<T...>::operator==(const DataFrame<T...> &df)
+    {
+        if (this->rows != df.rows || this->cols != df.cols)
+        {
+            return false;
+        }
+        for (auto it = this->data.begin(); it != this->data.end(); it++)
+        {
+            if (df.data.find(it->first) == df.data.end())
+            {
+                return false;
+            }
+            for (int i = 0; i < this->rows; i++)
+            {
+                if (it->second[i] != df.data.at(it->first)[i])
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
 #endif
