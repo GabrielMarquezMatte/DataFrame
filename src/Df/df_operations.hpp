@@ -1,24 +1,27 @@
 #ifndef DATAFRAME_OPERATIONS_HPP
 #define DATAFRAME_OPERATIONS_HPP
 #include "class_header.hpp"
+#include <sstream>
 namespace df
 {
     template <typename... T>
     void DataFrame<T...>::print()
     {
+        std::stringstream ss;
         for (auto it = data.begin(); it != data.end(); it++)
         {
-            std::cout << it->first << "\t";
+            ss << it->first << "\t";
         }
-        std::cout << "\n";
+        ss << "\n";
         for (int i = 0; i < rows; i++)
         {
             for (auto it = data.begin(); it != data.end(); it++)
             {
-                std::cout << it->second[i] << "\t";
+                ss << it->second[i] << "\t";
             }
-            std::cout << "\n";
+            ss << "\n";
         }
+        std::cout << ss.str();
     }
     template <typename... T>
     void DataFrame<T...>::concat(const DataFrame<T...> df)
@@ -128,7 +131,7 @@ namespace df
             newDf.data = this->data;
             for (auto it = df.data.begin(); it != df.data.end(); it++)
             {
-                if (this->data.find(it->first) != this->data.end())
+                if (this->data.find(it->first) == this->data.end())
                 {
                     newDf.data[it->first] = series<T...>();
                     newDf.data[it->first].reserve(this->rows);
@@ -173,7 +176,7 @@ namespace df
             }
             for (auto it = df.data.begin(); it != df.data.end(); it++)
             {
-                if (this->data.find(it->first) != this->data.end())
+                if (this->data.find(it->first) == this->data.end())
                 {
                     newDf.data[it->first] = series<T...>();
                     newDf.data[it->first].reserve(this->rows + df.rows);

@@ -27,7 +27,7 @@ namespace df
     template <typename... T>
     using data_vec = con::vector<boost::unordered_map<std::string, boost::variant<T...>>>;
     template <typename... T>
-    using series = boost::container::vector<boost::variant<T...>>;
+    using series = con::vector<boost::variant<T...>>;
     using column_set = boost::unordered_set<std::string>;
     #else
     using data_map = std::unordered_map<std::string, std::vector<std::variant<T...>>>;
