@@ -107,7 +107,7 @@ namespace df
                 {
                     if (newDf.data.find(it2->first) == newDf.data.end())
                     {
-                        newDf.data[it2->first] = con::vector<boost::variant<T...>>();
+                        newDf.data[it2->first] = na_value<T...>();
                     }
                     newDf.data[it2->first].push_back(it2->second[i]);
                 }
@@ -223,11 +223,7 @@ namespace df
                         }
                         else
                         {
-                            #ifdef USE_BOOST
-                            it->second.push_back(boost::variant<T...>());
-                            #else
-                            it->second.push_back(std::variant<T...>());
-                            #endif
+                            it->second.push_back(na_value<T...>());
                         }
                     }
                     newDf.rows++;
@@ -288,6 +284,10 @@ namespace df
             }
         }
         return true;
+    }
+    template <typename... T>
+    bool DataFrame<T...>::operator!=(const DataFrame<T...> &df){
+        return !(*this == df);
     }
 }
 #endif

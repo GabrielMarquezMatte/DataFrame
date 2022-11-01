@@ -125,6 +125,36 @@ bool JoinMultiple()
         return false;
     }
 }
+bool JoinNA()
+{
+    try
+    {
+        df::data_map<int64_t, std::string> data = {
+            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
+            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
+        df::DataFrame<int64_t, std::string> df(data);
+        df::data_map<int64_t, std::string> data2 = {
+            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9}},
+            {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i"}}};
+        df::DataFrame<int64_t, std::string> df2(data2);
+        df::DataFrame<int64_t, std::string> df3 = df.join(df2, df::column_set{"id"}, df::JoinTypes::LEFT);
+        df::data_map<int64_t,std::string> data3 = {
+            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
+            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}},
+            {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}}};
+        df::DataFrame<int64_t, std::string> df4(data3);
+        bool teste1 = (df3.getRows() == 10);
+        bool teste2 = (df3.getCols() == 3);
+        bool teste3 = (df3 != df4);
+        df3.print();
+        return teste1 && teste2 && teste3;
+    }
+    catch (std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
+        return false;
+    }
+}
 int main()
 {
     std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
@@ -168,6 +198,14 @@ int main()
     else
     {
         ss << "Test 5 failed\n";
+    }
+    if (JoinNA())
+    {
+        ss << "Test 6 passed\n";
+    }
+    else
+    {
+        ss << "Test 6 failed\n";
     }
     std::cout << ss.str();
     std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();

@@ -29,6 +29,10 @@ namespace df
     template <typename... T>
     using series = con::vector<boost::variant<T...>>;
     using column_set = boost::unordered_set<std::string>;
+    template <typename... T>
+    using na_value = boost::variant<T...>;
+    template <typename... T>
+    using vector = con::vector<T...>;
     #else
     using data_map = std::unordered_map<std::string, std::vector<std::variant<T...>>>;
     template <typename... T>
@@ -36,6 +40,10 @@ namespace df
     template <typename... T>
     using series = std::vector<std::variant<T...>>;
     using column_set = std::unordered_set<std::string>;
+    template <typename... T>
+    using na_value = std::variant<T...>;
+    template <typename... T>
+    using vector = std::vector<T...>;
     #endif
     enum JoinTypes
     {
@@ -80,6 +88,7 @@ namespace df
         void load_csv(const fs::path &path, const char &delimiter);
         #endif
         bool operator==(const DataFrame<T...> &df);
+        bool operator!=(const DataFrame<T...> &df);
     };
 }
 #endif
