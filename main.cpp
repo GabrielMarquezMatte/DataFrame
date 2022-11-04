@@ -1,14 +1,27 @@
 #define USE_BOOST
 #include "Df/DataFrame.hpp"
 #include <chrono>
+static const df::data_map<int64_t, std::string> BASE_DATA = {
+            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
+            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
+static const df::DataFrame<int64_t, std::string> BASE_DF(BASE_DATA);
+class Timer{
+public:
+    Timer() : start(std::chrono::high_resolution_clock::now()) {}
+    ~Timer() {
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        std::cout << duration.count() << " ms\n";
+    }
+private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> start;
+};
 bool SelectTest()
 {
     try
     {
-        df::data_map<int64_t, std::string> data = {
-            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
-            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
-        df::DataFrame<int64_t, std::string> df(data);
+        Timer t;
+        df::DataFrame df = BASE_DF;
         bool teste1 = (df.getCols() == 2);
         bool teste2 = (df.getRows() == 10);
         df::DataFrame<int64_t, std::string> df2 = df.select(df::column_set{"id"});
@@ -26,10 +39,8 @@ bool ConcatTest()
 {
     try
     {
-        df::data_map<int64_t, std::string> data = {
-            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
-            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
-        df::DataFrame<int64_t, std::string> df(data);
+        Timer t;
+        df::DataFrame df = BASE_DF;
         bool teste1 = (df.getRows() == 10);
         df::data_map<int64_t, std::string> data2 = {
             {"id", {11, 12, 13, 14, 15, 16, 17, 18, 19, 20}},
@@ -50,10 +61,8 @@ bool GetRowsAndColsTest()
 {
     try
     {
-        df::data_map<int64_t, std::string> data = {
-            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
-            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
-        df::DataFrame<int64_t, std::string> df(data);
+        Timer t;
+        df::DataFrame df = BASE_DF;
         bool teste1 = (df.getRows() == 10);
         bool teste2 = (df.getCols() == 2);
         return teste1 && teste2;
@@ -68,10 +77,8 @@ bool LeftJoinTest()
 {
     try
     {
-        df::data_map<int64_t, std::string> data = {
-            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
-            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
-        df::DataFrame<int64_t, std::string> df(data);
+        Timer t;
+        df::DataFrame df = BASE_DF;
         df::data_map<int64_t, std::string> data2 = {
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}}};
@@ -97,6 +104,7 @@ bool JoinMultiple()
 {
     try
     {
+        Timer t;
         df::data_map<int64_t, std::string> data = {
             {"id1", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"id2", {11, 12, 13, 14, 15, 16, 17, 18, 19, 20}},
@@ -129,10 +137,8 @@ bool JoinNA()
 {
     try
     {
-        df::data_map<int64_t, std::string> data = {
-            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
-            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
-        df::DataFrame<int64_t, std::string> df(data);
+        Timer t;
+        df::DataFrame df = BASE_DF;
         df::data_map<int64_t, std::string> data2 = {
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9}},
             {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i"}}};
@@ -146,7 +152,6 @@ bool JoinNA()
         bool teste1 = (df3.getRows() == 10);
         bool teste2 = (df3.getCols() == 3);
         bool teste3 = (df3 != df4);
-        df3.print();
         return teste1 && teste2 && teste3;
     }
     catch (std::exception &e)
@@ -155,9 +160,69 @@ bool JoinNA()
         return false;
     }
 }
+bool FindTest()
+{
+    try
+    {
+        Timer t;
+        df::DataFrame df = BASE_DF;
+        bool teste1 = (df.getCols() == 2);
+        bool teste2 = (df.getRows() == 10);
+        df::DataFrame<int64_t, std::string> df2 = df.find("id",1);
+        bool teste3 = (df2.getCols() == 2);
+        bool teste4 = (df2.getRows() == 1);
+        return teste1 && teste2 && teste3 && teste4;
+    }
+    catch (std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
+        return false;
+    }
+}
+bool WriteCsvTest(){
+    try{
+        Timer t;
+        df::DataFrame df = BASE_DF;
+        df.write_csv(std::string("teste.csv"),';');
+        df::DataFrame<int64_t,std::string> df2;
+        df2.load_csv(std::string("teste.csv"),';');
+        bool teste1 = df2.getRows() == 10;
+        bool teste2 = df2.getCols() == 2;
+        auto valor = df2.get(0,0);
+        #ifdef USE_BOOST
+        bool teste3 = boost::lexical_cast<int64_t>(valor) == 1;
+        fs::remove("teste.csv");
+        #else
+        bool teste3 = std::get<int64_t>(valor) == 1;
+        std::remove("teste.csv");
+        #endif
+        return teste1 && teste2 && teste3;
+    }
+    catch(std::exception &e){
+        std::cout << e.what() << std::endl;
+        return false;
+    }
+}
+bool LoadTest(){
+    try{
+        Timer t;
+        df::data_map<int64_t,std::string> data = {
+            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
+            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
+        df::DataFrame<int64_t,std::string> df;
+        df.load(data);
+        bool teste1 = df.getRows() == 10;
+        bool teste2 = df.getCols() == 2;
+        return teste1 && teste2;
+    }
+    catch(std::exception &e){
+        std::cout << e.what() << std::endl;
+        return false;
+    }
+}
 int main()
 {
-    std::chrono::steady_clock::time_point start = std::chrono::high_resolution_clock::now();
+    Timer t;
     std::stringstream ss;
     if (SelectTest())
     {
@@ -207,8 +272,24 @@ int main()
     {
         ss << "Test 6 failed\n";
     }
+    if(FindTest()){
+        ss << "Test 7 passed\n";
+    }
+    else{
+        ss << "Test 7 failed\n";
+    }
+    if(WriteCsvTest()){
+        ss << "Test 8 passed\n";
+    }
+    else{
+        ss << "Test 8 failed\n";
+    }
+    if(LoadTest()){
+        ss << "Test 9 passed\n";
+    }
+    else{
+        ss << "Test 9 failed\n";
+    }
     std::cout << ss.str();
-    std::chrono::steady_clock::time_point end = std::chrono::high_resolution_clock::now();
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << " microseconds" << std::endl;
     return 0;
 }

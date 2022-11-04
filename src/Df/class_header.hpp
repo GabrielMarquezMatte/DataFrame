@@ -10,6 +10,8 @@
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/variant.hpp>
+#include <boost/sort/sort.hpp>
+#include <boost/lexical_cast.hpp>
 namespace fs = boost::filesystem;
 namespace con = boost::container;
 #else
@@ -33,6 +35,8 @@ namespace df
     using na_value = boost::variant<T...>;
     template <typename... T>
     using vector = con::vector<T...>;
+    template <typename... T>
+    using value_t = boost::variant<T...>;
     #else
     using data_map = std::unordered_map<std::string, std::vector<std::variant<T...>>>;
     template <typename... T>
@@ -44,6 +48,8 @@ namespace df
     using na_value = std::variant<T...>;
     template <typename... T>
     using vector = std::vector<T...>;
+    template <typename... T>
+    using value_t = std::variant<T...>;
     #endif
     enum JoinTypes
     {
@@ -73,20 +79,23 @@ namespace df
         const int getRows() const;
         const int getCols() const;
         DataFrame<T...> select(column_set &columns);
-        DataFrame<T...> select(std::string_view column);
-        DataFrame<T...> find(std::string_view column, const T &...value);
+        DataFrame<T...> select(const std::string& column);
+        DataFrame<T...> find(const std::string& column, const value_t<T...> &value);
         DataFrame<T...> join(const DataFrame<T...> &df, const column_set &columns, JoinTypes type);
-        #ifdef USE_BOOST
-        boost::variant<T...> get(const int& row,int col);
-        #else
-        std::variant<T...> get(const int& row,int col);
-        #endif
+        value_t<T...> get(const int& row,int col);
+        DataFrame<T...> sort(const std::string& column);
+        DataFrame<T...> sort(const column_set& columns);
+        DataFrame<T...> distinct(const std::string& column);
+        DataFrame<T...> distinct(const column_set& columns);
+        DataFrame<T...> distinct();
         void load(const data_map<T...> &data);
         void load(const data_vec<T...> &data);
-        void load_csv(std::string_view path, const char &delimiter);
+        void load_csv(const std::string& path, const char &delimiter = ";");
         #ifdef USE_BOOST
-        void load_csv(const fs::path &path, const char &delimiter);
+        void load_csv(const fs::path &path, const char &delimiter = ";");
+        void write_csv(const fs::path &path, const char &delimiter = ";");
         #endif
+        void write_csv(const std::string& path, const char &delimiter = ";");
         bool operator==(const DataFrame<T...> &df);
         bool operator!=(const DataFrame<T...> &df);
     };

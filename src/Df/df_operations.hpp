@@ -85,7 +85,7 @@ namespace df
         return newDf;
     }
     template <typename... T>
-    DataFrame<T...> DataFrame<T...>::select(std::string_view column)
+    DataFrame<T...> DataFrame<T...>::select(const std::string& column)
     {
         const DataFrame<T...> newDf;
         newDf.data[column] = this->data.at(column);
@@ -95,25 +95,22 @@ namespace df
         return newDf;
     }
     template <typename... T>
-    DataFrame<T...> DataFrame<T...>::find(std::string_view column, const T &...value)
+    DataFrame<T...> DataFrame<T...>::find(const std::string& column, const value_t<T...> &value)
     {
-        const DataFrame<T...> newDf;
+        DataFrame<T...> newDf;
         int i = 0;
-        for (auto it = this->data.at(column).begin(); it != this->data.at(column).end(); it++)
+        for(int j = 0; j < this->rows; j++)
         {
-            if (std::find(std::begin({value...}), std::end({value...}), *it) != std::end({value...}))
+            if(this->data.at(column)[j] == value)
             {
-                for (auto it2 = this->data.begin(); it2 != this->data.end(); it2++)
+                for(auto it = this->data.begin(); it != this->data.end(); it++)
                 {
-                    if (newDf.data.find(it2->first) == newDf.data.end())
-                    {
-                        newDf.data[it2->first] = na_value<T...>();
-                    }
-                    newDf.data[it2->first].push_back(it2->second[i]);
+                    newDf.data[it->first].push_back(it->second[j]);
                 }
-                newDf.rows++;
+                i++;
             }
         }
+        newDf.rows = i;
         newDf.cols = this->cols;
         newDf.columns = this->columns;
         return newDf;
@@ -233,9 +230,8 @@ namespace df
         }
         return newDf;
     }
-    #ifdef USE_BOOST
     template <typename... T>
-    boost::variant<T...> DataFrame<T...>::get(const int &row, int col)
+    value_t<T...> DataFrame<T...>::get(const int &row, int col)
     {
         for (auto it = this->data.begin(); it != this->data.end(); it++)
         {
@@ -247,21 +243,32 @@ namespace df
         }
         throw std::out_of_range("Column out of range");
     }
-    #else
     template <typename... T>
-    std::variant<T...> DataFrame<T...>::get(const int &row, int col)
+    DataFrame<T...> DataFrame<T...>::sort(const std::string& column)
     {
-        for (auto it = this->data.begin(); it != this->data.end(); it++)
-        {
-            if (col == 0)
-            {
-                return it->second[row];
-            }
-            col--;
-        }
-        throw std::out_of_range("Column out of range");
+        DataFrame<T...> newDf;
+        newDf.data = this->data;
+        newDf.rows = this->rows;
+        newDf.cols = this->cols;
+        newDf.columns = this->columns;
+        std::sort(newDf.data.at(column).begin(), newDf.data.at(column).end());
+        return newDf;
     }
-    #endif
+    template <typename... T>
+    DataFrame<T...> DataFrame<T...>::sort(const column_set& columns)
+    {
+        DataFrame<T...> newDf;
+        newDf.data = this->data;
+        newDf.rows = this->rows;
+        newDf.cols = this->cols;
+        newDf.columns = this->columns;
+        std::sort(newDf.data.at(*columns.begin()).begin(), newDf.data.at(*columns.begin()).end());
+        for (auto it = columns.begin(); it != columns.end(); it++)
+        {
+            std::sort(newDf.data.at(*it).begin(), newDf.data.at(*it).end());
+        }
+        return newDf;
+    }
     template <typename... T>
     bool DataFrame<T...>::operator==(const DataFrame<T...> &df)
     {
