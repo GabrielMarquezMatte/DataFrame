@@ -2,25 +2,37 @@
 #include "Df/DataFrame.hpp"
 #include <chrono>
 static const df::data_map<int64_t, std::string> BASE_DATA = {
-            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
-            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
+    {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
+    {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
 static const df::DataFrame<int64_t, std::string> BASE_DF(BASE_DATA);
-class Timer{
+class Timer
+{
 public:
     Timer() : start(std::chrono::high_resolution_clock::now()) {}
-    ~Timer() {
+    Timer(std::string_view name) : start(std::chrono::high_resolution_clock::now()), function_name(name) {}
+    ~Timer()
+    {
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << duration.count() << " ms\n";
+        if (function_name.has_value())
+        {
+            std::cout << function_name.value() << ": " << duration.count() << " ms\n";
+        }
+        else
+        {
+            std::cout << "Time: " << duration.count() << " ms\n";
+        }
     }
+
 private:
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
+    std::optional<std::string_view> function_name;
 };
 bool SelectTest()
 {
     try
     {
-        Timer t;
+        Timer t("SelectTest");
         df::DataFrame df = BASE_DF;
         bool teste1 = (df.getCols() == 2);
         bool teste2 = (df.getRows() == 10);
@@ -39,7 +51,7 @@ bool ConcatTest()
 {
     try
     {
-        Timer t;
+        Timer t("ConcatTest");
         df::DataFrame df = BASE_DF;
         bool teste1 = (df.getRows() == 10);
         df::data_map<int64_t, std::string> data2 = {
@@ -61,7 +73,7 @@ bool GetRowsAndColsTest()
 {
     try
     {
-        Timer t;
+        Timer t("GetRowsAndColsTest");
         df::DataFrame df = BASE_DF;
         bool teste1 = (df.getRows() == 10);
         bool teste2 = (df.getCols() == 2);
@@ -77,14 +89,14 @@ bool LeftJoinTest()
 {
     try
     {
-        Timer t;
+        Timer t("LeftJoinTest");
         df::DataFrame df = BASE_DF;
         df::data_map<int64_t, std::string> data2 = {
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}}};
         df::DataFrame<int64_t, std::string> df2(data2);
         df::DataFrame<int64_t, std::string> df3 = df.join(df2, df::column_set{"id"}, df::JoinTypes::LEFT);
-        df::data_map<int64_t,std::string> data3 = {
+        df::data_map<int64_t, std::string> data3 = {
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}},
             {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}}};
@@ -104,7 +116,7 @@ bool JoinMultiple()
 {
     try
     {
-        Timer t;
+        Timer t("JoinMultiple");
         df::data_map<int64_t, std::string> data = {
             {"id1", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"id2", {11, 12, 13, 14, 15, 16, 17, 18, 19, 20}},
@@ -115,8 +127,8 @@ bool JoinMultiple()
             {"id2", {11, 12, 13, 14, 15, 16, 17, 18, 19, 20}},
             {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}}};
         df::DataFrame<int64_t, std::string> df2(data2);
-        df::DataFrame<int64_t, std::string> df3 = df.join(df2, df::column_set{"id1","id2"}, df::JoinTypes::INNER);
-        df::data_map<int64_t,std::string> data3 = {
+        df::DataFrame<int64_t, std::string> df3 = df.join(df2, df::column_set{"id1", "id2"}, df::JoinTypes::INNER);
+        df::data_map<int64_t, std::string> data3 = {
             {"id1", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"id2", {11, 12, 13, 14, 15, 16, 17, 18, 19, 20}},
             {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}},
@@ -137,14 +149,14 @@ bool JoinNA()
 {
     try
     {
-        Timer t;
+        Timer t("JoinNA");
         df::DataFrame df = BASE_DF;
         df::data_map<int64_t, std::string> data2 = {
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9}},
             {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i"}}};
         df::DataFrame<int64_t, std::string> df2(data2);
         df::DataFrame<int64_t, std::string> df3 = df.join(df2, df::column_set{"id"}, df::JoinTypes::LEFT);
-        df::data_map<int64_t,std::string> data3 = {
+        df::data_map<int64_t, std::string> data3 = {
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}},
             {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}}};
@@ -164,11 +176,11 @@ bool FindTest()
 {
     try
     {
-        Timer t;
+        Timer t("FindTest");
         df::DataFrame df = BASE_DF;
         bool teste1 = (df.getCols() == 2);
         bool teste2 = (df.getRows() == 10);
-        df::DataFrame<int64_t, std::string> df2 = df.find("id",1);
+        df::DataFrame<int64_t, std::string> df2 = df.find("id", 1);
         bool teste3 = (df2.getCols() == 2);
         bool teste4 = (df2.getRows() == 1);
         return teste1 && teste2 && teste3 && teste4;
@@ -179,50 +191,74 @@ bool FindTest()
         return false;
     }
 }
-bool WriteCsvTest(){
-    try{
-        Timer t;
+bool WriteCsvTest()
+{
+    try
+    {
+        Timer t("WriteCsvTest");
         df::DataFrame df = BASE_DF;
-        df.write_csv(std::string("teste.csv"),';');
-        df::DataFrame<int64_t,std::string> df2;
-        df2.load_csv(std::string("teste.csv"),';');
+        {
+            Timer t1("Writting");
+            df.write_csv(std::string("teste.csv"), ';');
+        }
+        df::DataFrame<int64_t, std::string> df2;
+        df2.load_csv(std::string("teste.csv"), ';');
         bool teste1 = df2.getRows() == 10;
         bool teste2 = df2.getCols() == 2;
-        auto valor = df2.get(0,0);
-        #ifdef USE_BOOST
-        bool teste3 = boost::lexical_cast<int64_t>(valor) == 1;
+        auto valor = df2.get(0, 0);
+#ifdef USE_BOOST
+        bool teste3 = boost::get<int64_t>(valor) == 1;
         fs::remove("teste.csv");
-        #else
+#else
         bool teste3 = std::get<int64_t>(valor) == 1;
         std::remove("teste.csv");
-        #endif
+#endif
         return teste1 && teste2 && teste3;
     }
-    catch(std::exception &e){
+    catch (std::exception &e)
+    {
         std::cout << e.what() << std::endl;
         return false;
     }
 }
-bool LoadTest(){
-    try{
-        Timer t;
-        df::data_map<int64_t,std::string> data = {
+bool LoadTest()
+{
+    try
+    {
+        Timer t("LoadTest");
+        df::data_map<int64_t, std::string> data = {
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
-        df::DataFrame<int64_t,std::string> df;
+        df::DataFrame<int64_t, std::string> df;
         df.load(data);
         bool teste1 = df.getRows() == 10;
         bool teste2 = df.getCols() == 2;
         return teste1 && teste2;
     }
-    catch(std::exception &e){
+    catch (std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
+        return false;
+    }
+}
+bool WriteXlsxTest()
+{
+    try
+    {
+        Timer t("WriteXlsxTest");
+        df::DataFrame df = BASE_DF;
+        df.write_xlsx(std::string("teste.xlsx"));
+        return true;
+    }
+    catch(std::exception &e)
+    {
         std::cout << e.what() << std::endl;
         return false;
     }
 }
 int main()
 {
-    Timer t;
+    Timer t("Main");
     std::stringstream ss;
     if (SelectTest())
     {
@@ -272,23 +308,37 @@ int main()
     {
         ss << "Test 6 failed\n";
     }
-    if(FindTest()){
+    if (FindTest())
+    {
         ss << "Test 7 passed\n";
     }
-    else{
+    else
+    {
         ss << "Test 7 failed\n";
     }
-    if(WriteCsvTest()){
+    if (WriteCsvTest())
+    {
         ss << "Test 8 passed\n";
     }
-    else{
+    else
+    {
         ss << "Test 8 failed\n";
     }
-    if(LoadTest()){
+    if (LoadTest())
+    {
         ss << "Test 9 passed\n";
     }
-    else{
+    else
+    {
         ss << "Test 9 failed\n";
+    }
+    if (WriteXlsxTest())
+    {
+        ss << "Test 10 passed\n";
+    }
+    else
+    {
+        ss << "Test 10 failed\n";
     }
     std::cout << ss.str();
     return 0;

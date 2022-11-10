@@ -2,6 +2,8 @@
 #define DATAFRAME_CLASS_HEADER_HPP
 #include <iostream>
 #include <string>
+#include <iomanip>
+#include <xlnt/xlnt.hpp>
 #ifdef USE_BOOST
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -96,6 +98,7 @@ namespace df
         void write_csv(const fs::path &path, const char &delimiter = ";");
         #endif
         void write_csv(const std::string& path, const char &delimiter = ";");
+        void write_xlsx(const std::string& path);
         bool operator==(const DataFrame<T...> &df);
         bool operator!=(const DataFrame<T...> &df);
     };

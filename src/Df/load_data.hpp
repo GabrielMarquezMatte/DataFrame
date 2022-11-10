@@ -1,6 +1,7 @@
 #ifndef DATAFRAME_LOAD_DATA_HPP
 #define DATAFRAME_LOAD_DATA_HPP
 #include "class_header.hpp"
+#include <stdio.h>
 namespace df
 {
     template <typename... T>
@@ -29,13 +30,13 @@ namespace df
         }
     }
     template <typename... T>
-    void DataFrame<T...>::load_csv(const std::string& path, const char &delimiter)
+    void DataFrame<T...>::load_csv(const std::string &path, const char &delimiter)
     {
-        #ifdef USE_BOOST
+#ifdef USE_BOOST
         fs::ifstream file(path);
-        #else
+#else
         std::ifstream file(path);
-        #endif
+#endif
         if (!file.is_open())
         {
             throw std::runtime_error("File not found");
@@ -58,11 +59,11 @@ namespace df
             while (std::getline(ss, value, delimiter))
             {
                 auto it = this->columns.begin();
-                #ifdef USE_BOOST
+#ifdef USE_BOOST
                 boost::advance(it, i);
-                #else
+#else
                 std::advance(it, i);
-                #endif
+#endif
                 std::string column = *it;
                 this->data[column].push_back(value);
                 i++;
@@ -98,12 +99,12 @@ namespace df
             while (std::getline(ss, value, delimiter))
             {
                 auto it = this->columns.begin();
-                #ifdef USE_BOOST
+#ifdef USE_BOOST
                 boost::advance(it, i);
-                #else
+#else
                 std::advance(it, i);
-                #endif
-                std::string& column = *it;
+#endif
+                std::string &column = *it;
                 this->data[column].push_back(boost::lexical_cast<boost::variant<T...>>(value));
                 i++;
             }
@@ -138,39 +139,79 @@ namespace df
         }
     }
 #endif
-    template<typename... T>
-    void DataFrame<T...>::write_csv(const std::string& path, const char& delimiter)
+    template <typename... T>
+    void DataFrame<T...>::write_csv(const std::string &path, const char &delimiter)
     {
         try
         {
-            #ifdef USE_BOOST
-            fs::ofstream file(path);
-            #else
-            std::ofstream file(path);
-            #endif
+            std::string ss;
             for (auto &column : this->columns)
             {
-                file << column << delimiter;
+                ss += column + delimiter;
             }
-            file << "\n";
+            ss += "\n";
             for (int i = 0; i < this->rows; i++)
             {
                 for (auto &column : this->columns)
                 {
-                    #ifdef USE_BOOST
-                    file << boost::lexical_cast<std::string>(this->data[column].at(i)) << delimiter;
-                    #else
-                    file << std::to_string(this->data[column].at(i)) << delimiter;
-                    #endif
+#ifdef USE_BOOST
+                    ss += boost::lexical_cast<std::string>(this->data[column].at(i)) += delimiter;
+#else
+                    ss += std::to_string(this->data[column].at(i)) += delimiter;
+#endif
                 }
-                file << "\n";
+                ss += "\n";
             }
-            file.close();
+            FILE *file = fopen(path.c_str(), "w");
+            fwrite(ss.c_str(), sizeof(char), ss.size(), file);
+            fclose(file);
         }
         catch (const std::exception &e)
         {
             std::cout << e.what() << std::endl;
         }
+    }
+    template <typename... T>
+    void DataFrame<T...>::write_xlsx(const std::string &path)
+    {
+        xlnt::workbook wb;
+        xlnt::worksheet ws = wb.active_sheet();
+        int row = 1;
+        int col = 1;
+        for (auto &column : this->columns)
+        {
+            ws.cell(row, col).value(column);
+            col++;
+        }
+        row++;
+        col = 1;
+        for (int i = 0; i < this->rows; i++)
+        {
+            for (auto &column : this->columns)
+            {
+                auto value = this->data[column].at(i);
+                if (std::is_arithmetic<decltype(value)>::value)
+                {
+#ifdef USE_BOOST
+                    ws.cell(row, col).value(boost::lexical_cast<double>(value));
+#else
+                    ws.cell(row, col).value(std::stod(value));
+#endif
+                }
+                else
+                {
+#ifdef USE_BOOST
+                    ws.cell(row, col).value(boost::lexical_cast<std::string>(value));
+#else
+                    ws.cell(row, col).value(value);
+#endif
+                }
+                col++;
+            }
+            row++;
+            col = 1;
+        }
+        wb.save(path);
     }
 }
 #endif

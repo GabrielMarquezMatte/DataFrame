@@ -85,7 +85,7 @@ namespace df
         return newDf;
     }
     template <typename... T>
-    DataFrame<T...> DataFrame<T...>::select(const std::string& column)
+    DataFrame<T...> DataFrame<T...>::select(const std::string &column)
     {
         const DataFrame<T...> newDf;
         newDf.data[column] = this->data.at(column);
@@ -95,15 +95,15 @@ namespace df
         return newDf;
     }
     template <typename... T>
-    DataFrame<T...> DataFrame<T...>::find(const std::string& column, const value_t<T...> &value)
+    DataFrame<T...> DataFrame<T...>::find(const std::string &column, const value_t<T...> &value)
     {
         DataFrame<T...> newDf;
         int i = 0;
-        for(int j = 0; j < this->rows; j++)
+        for (int j = 0; j < this->rows; j++)
         {
-            if(this->data.at(column)[j] == value)
+            if (this->data.at(column)[j] == value)
             {
-                for(auto it = this->data.begin(); it != this->data.end(); it++)
+                for (auto it = this->data.begin(); it != this->data.end(); it++)
                 {
                     newDf.data[it->first].push_back(it->second[j]);
                 }
@@ -244,7 +244,7 @@ namespace df
         throw std::out_of_range("Column out of range");
     }
     template <typename... T>
-    DataFrame<T...> DataFrame<T...>::sort(const std::string& column)
+    DataFrame<T...> DataFrame<T...>::sort(const std::string &column)
     {
         DataFrame<T...> newDf;
         newDf.data = this->data;
@@ -255,7 +255,7 @@ namespace df
         return newDf;
     }
     template <typename... T>
-    DataFrame<T...> DataFrame<T...>::sort(const column_set& columns)
+    DataFrame<T...> DataFrame<T...>::sort(const column_set &columns)
     {
         DataFrame<T...> newDf;
         newDf.data = this->data;
@@ -293,7 +293,8 @@ namespace df
         return true;
     }
     template <typename... T>
-    bool DataFrame<T...>::operator!=(const DataFrame<T...> &df){
+    bool DataFrame<T...>::operator!=(const DataFrame<T...> &df)
+    {
         return !(*this == df);
     }
 }
