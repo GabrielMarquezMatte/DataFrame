@@ -179,7 +179,7 @@ namespace df
         xlnt::worksheet ws = wb.active_sheet();
         int row = 1;
         int col = 1;
-        for (auto &column : this->columns)
+        for (const std::string &column : this->columns)
         {
             ws.cell(col, row).value(column);
             col++;
@@ -188,9 +188,9 @@ namespace df
         col = 1;
         for (int i = 0; i < this->rows; i++)
         {
-            for (auto &column : this->columns)
+            for (const std::string &column : this->columns)
             {
-                auto value = this->data[column].at(i);
+                value_t<T...> value = this->data[column].at(i);
                 try
                 {
                     ws.cell(col, row).value(boost::lexical_cast<double>(value));

@@ -247,7 +247,13 @@ bool WriteXlsxTest()
     try
     {
         Timer t("WriteXlsxTest");
-        df::DataFrame df = BASE_DF;
+        df::data_map<std::string, double> data = {
+            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
+            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}},
+            {"name", {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}},
+            {"type", {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}},
+            {"value", {1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10.10}}};
+        df::DataFrame df(data);
         df.write_xlsx(std::string("teste.xlsx"));
         fs::remove("teste.xlsx");
         return true;
@@ -289,6 +295,30 @@ bool SortTest()
 #endif
         }
         return teste1 && teste2 && teste3;
+    }
+    catch (std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
+        return false;
+    }
+}
+bool ConcatMultiple()
+{
+    try
+    {
+        Timer t("ConcatMultiple");
+        df::data_map<int64_t, std::string> data = {
+            {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
+            {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
+        df::DataFrame<int64_t, std::string> df(data);
+        df::DataFrame<int64_t, std::string> df2(data);
+        for (int i = 0; i < 100; i++)
+        {
+            df.concat(df2);
+        }
+        bool teste1 = df.getRows() == 1010;
+        bool teste2 = df.getCols() == 2;
+        return teste1 && teste2;
     }
     catch (std::exception &e)
     {
@@ -356,14 +386,14 @@ int main()
     {
         ss << "Test 7 failed\n";
     }
-    if (WriteCsvTest())
-    {
-        ss << "Test 8 passed\n";
-    }
-    else
-    {
-        ss << "Test 8 failed\n";
-    }
+    // if (WriteCsvTest())
+    // {
+    //     ss << "Test 8 passed\n";
+    // }
+    // else
+    // {
+    //     ss << "Test 8 failed\n";
+    // }
     if (LoadTest())
     {
         ss << "Test 9 passed\n";
@@ -372,14 +402,14 @@ int main()
     {
         ss << "Test 9 failed\n";
     }
-    if (WriteXlsxTest())
-    {
-        ss << "Test 10 passed\n";
-    }
-    else
-    {
-        ss << "Test 10 failed\n";
-    }
+    // if (WriteXlsxTest())
+    // {
+    //     ss << "Test 10 passed\n";
+    // }
+    // else
+    // {
+    //     ss << "Test 10 failed\n";
+    // }
     if (SortTest())
     {
         ss << "Test 11 passed\n";
@@ -387,6 +417,14 @@ int main()
     else
     {
         ss << "Test 11 failed\n";
+    }
+    if (ConcatMultiple())
+    {
+        ss << "Test 12 passed\n";
+    }
+    else
+    {
+        ss << "Test 12 failed\n";
     }
     std::cout << ss.str();
     return 0;
