@@ -27,10 +27,6 @@
             "version>=": "1.79.0"
         },
         {
-            "name": "boost-sort",
-            "version>=": "1.79.0"
-        },
-        {
             "name": "xlnt",
             "version>=": "1.5.0#4"
         }

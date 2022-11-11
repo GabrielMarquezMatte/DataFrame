@@ -90,6 +90,13 @@
         "unordered_set": "cpp",
         "future": "cpp",
         "condition_variable": "cpp",
-        "strstream": "cpp"
+        "strstream": "cpp",
+        "any": "cpp",
+        "execution": "cpp",
+        "queue": "cpp",
+        "scoped_allocator": "cpp",
+        "shared_mutex": "cpp",
+        "stack": "cpp",
+        "valarray": "cpp"
     }
 }

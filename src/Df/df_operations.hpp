@@ -251,7 +251,26 @@ namespace df
         newDf.rows = this->rows;
         newDf.cols = this->cols;
         newDf.columns = this->columns;
-        std::sort(newDf.data.at(column).begin(), newDf.data.at(column).end());
+        //Sort all columns by the given column
+        for (auto it = newDf.data.begin(); it != newDf.data.end(); it++)
+        {
+            vector<std::pair<value_t<T...>, int>> pairs;
+            for (int i = 0; i < newDf.rows; i++)
+            {
+                pairs.push_back(std::make_pair(newDf.data.at(column)[i], i));
+            }
+            std::sort(pairs.begin(), pairs.end());
+            for (auto it2 = newDf.data.begin(); it2 != newDf.data.end(); it2++)
+            {
+                series<T...> newCol;
+                newCol.reserve(newDf.rows);
+                for (int i = 0; i < newDf.rows; i++)
+                {
+                    newCol.push_back(newDf.data.at(it2->first)[pairs[i].second]);
+                }
+                newDf.data[it2->first] = newCol;
+            }
+        }
         return newDf;
     }
     template <typename... T>
@@ -262,10 +281,30 @@ namespace df
         newDf.rows = this->rows;
         newDf.cols = this->cols;
         newDf.columns = this->columns;
-        std::sort(newDf.data.at(*columns.begin()).begin(), newDf.data.at(*columns.begin()).end());
-        for (auto it = columns.begin(); it != columns.end(); it++)
+        //Sort all columns by the given columns
+        for (auto it = newDf.data.begin(); it != newDf.data.end(); it++)
         {
-            std::sort(newDf.data.at(*it).begin(), newDf.data.at(*it).end());
+            vector<std::pair<value_t<T...>, int>> pairs;
+            for (int i = 0; i < newDf.rows; i++)
+            {
+                value_t<T...> val = 0;
+                for (auto it2 = columns.begin(); it2 != columns.end(); it2++)
+                {
+                    val += newDf.data.at(*it2)[i];
+                }
+                pairs.push_back(std::make_pair(val, i));
+            }
+            std::sort(pairs.begin(), pairs.end());
+            for (auto it2 = newDf.data.begin(); it2 != newDf.data.end(); it2++)
+            {
+                series<T...> newCol;
+                newCol.reserve(newDf.rows);
+                for (int i = 0; i < newDf.rows; i++)
+                {
+                    newCol.push_back(newDf.data.at(it2->first)[pairs[i].second]);
+                }
+                newDf.data[it2->first] = newCol;
+            }
         }
         return newDf;
     }

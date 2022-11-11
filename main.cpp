@@ -16,11 +16,11 @@ public:
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
         if (function_name.has_value())
         {
-            std::cout << function_name.value() << ": " << duration.count() << " ms\n";
+            std::cout << function_name.value() << ": " << duration.count() << " microseconds\n";
         }
         else
         {
-            std::cout << "Time: " << duration.count() << " ms\n";
+            std::cout << "Time: " << duration.count() << " microseconds\n";
         }
     }
 
@@ -207,7 +207,7 @@ bool WriteCsvTest()
         bool teste2 = df2.getCols() == 2;
         auto valor = df2.get(0, 0);
 #ifdef USE_BOOST
-        bool teste3 = boost::get<int64_t>(valor) == 1;
+        bool teste3 = boost::get<std::string>(valor) == "1";
         fs::remove("teste.csv");
 #else
         bool teste3 = std::get<int64_t>(valor) == 1;
@@ -248,9 +248,45 @@ bool WriteXlsxTest()
         Timer t("WriteXlsxTest");
         df::DataFrame df = BASE_DF;
         df.write_xlsx(std::string("teste.xlsx"));
+#ifdef USE_BOOST
+        fs::remove("teste.xlsx");
+#else
+        std::remove("teste.xlsx");
+#endif
         return true;
     }
-    catch(std::exception &e)
+    catch (std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
+        return false;
+    }
+}
+bool SortTest()
+{
+    try
+    {
+        Timer t("SortTest");
+        df::data_map<int64_t, std::string> data = {
+            {"id", {1, 4, 2, 5, 3, 6, 7, 8, 9, 10}},
+            {"age", {10, 40, 20, 50, 30, 60, 70, 80, 90, 100}}};
+        df::DataFrame<int64_t, std::string> df(data);
+        df::DataFrame df2 = df.sort("id");
+        bool teste1 = df2.getRows() == 10;
+        bool teste2 = df2.getCols() == 2;
+        bool teste3 = true;
+        for (int i = 0; i < 10; i++)
+        {
+            auto valor = df2.get(i, 0);
+            auto valor2 = df2.get(i, 1);
+#ifdef USE_BOOST
+            teste3 = teste3 && boost::get<int64_t>(valor) == i + 1 && boost::get<int64_t>(valor2) == (i + 1) * 10;
+#else
+            teste3 = teste3 && std::get<int64_t>(valor) == i + 1 && std::get<int64_t>(valor2) == (i + 1) * 10;
+#endif
+        }
+        return teste1 && teste2 && teste3;
+    }
+    catch (std::exception &e)
     {
         std::cout << e.what() << std::endl;
         return false;
@@ -339,6 +375,14 @@ int main()
     else
     {
         ss << "Test 10 failed\n";
+    }
+    if (SortTest())
+    {
+        ss << "Test 11 passed\n";
+    }
+    else
+    {
+        ss << "Test 11 failed\n";
     }
     std::cout << ss.str();
     return 0;

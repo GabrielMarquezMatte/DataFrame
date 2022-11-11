@@ -12,7 +12,6 @@
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/variant.hpp>
-#include <boost/sort/sort.hpp>
 #include <boost/lexical_cast.hpp>
 namespace fs = boost::filesystem;
 namespace con = boost::container;
