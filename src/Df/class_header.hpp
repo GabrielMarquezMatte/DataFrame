@@ -4,6 +4,7 @@
 #include <string>
 #include <iomanip>
 #include <xlnt/xlnt.hpp>
+#include <optional>
 #ifdef USE_BOOST
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -97,7 +98,9 @@ namespace df
         void write_csv(const fs::path &path, const char &delimiter = ";");
         #endif
         void write_csv(const std::string& path, const char &delimiter = ";");
+        #ifdef USE_BOOST
         void write_xlsx(const std::string& path);
+        #endif
         bool operator==(const DataFrame<T...> &df);
         bool operator!=(const DataFrame<T...> &df);
     };

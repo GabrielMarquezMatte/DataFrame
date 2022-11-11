@@ -171,6 +171,7 @@ namespace df
             std::cout << e.what() << std::endl;
         }
     }
+#ifdef USE_BOOST
     template <typename... T>
     void DataFrame<T...>::write_xlsx(const std::string &path)
     {
@@ -180,7 +181,7 @@ namespace df
         int col = 1;
         for (auto &column : this->columns)
         {
-            ws.cell(row, col).value(column);
+            ws.cell(col, row).value(column);
             col++;
         }
         row++;
@@ -190,21 +191,13 @@ namespace df
             for (auto &column : this->columns)
             {
                 auto value = this->data[column].at(i);
-                if (std::is_arithmetic<decltype(value)>::value)
+                try
                 {
-#ifdef USE_BOOST
-                    ws.cell(row, col).value(boost::lexical_cast<double>(value));
-#else
-                    ws.cell(row, col).value(std::stod(value));
-#endif
+                    ws.cell(col, row).value(boost::lexical_cast<double>(value));
                 }
-                else
+                catch (const std::exception &e)
                 {
-#ifdef USE_BOOST
-                    ws.cell(row, col).value(boost::lexical_cast<std::string>(value));
-#else
-                    ws.cell(row, col).value(value);
-#endif
+                    ws.cell(col, row).value(boost::lexical_cast<std::string>(value));
                 }
                 col++;
             }
@@ -213,5 +206,6 @@ namespace df
         }
         wb.save(path);
     }
+#endif
 }
 #endif

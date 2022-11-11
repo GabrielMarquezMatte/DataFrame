@@ -44,6 +44,7 @@
         "streambuf": "cpp",
         "typeinfo": "cpp",
         "*.rmd": "markdown",
+        "*.sql": "sql",
         "xstring": "cpp",
         "xiosbase": "cpp",
         "optional": "cpp",
@@ -97,6 +98,8 @@
         "scoped_allocator": "cpp",
         "shared_mutex": "cpp",
         "stack": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "ranges": "cpp",
+        "span": "cpp"
     }
 }

@@ -241,6 +241,7 @@ bool LoadTest()
         return false;
     }
 }
+#ifdef USE_BOOST
 bool WriteXlsxTest()
 {
     try
@@ -248,11 +249,7 @@ bool WriteXlsxTest()
         Timer t("WriteXlsxTest");
         df::DataFrame df = BASE_DF;
         df.write_xlsx(std::string("teste.xlsx"));
-#ifdef USE_BOOST
         fs::remove("teste.xlsx");
-#else
-        std::remove("teste.xlsx");
-#endif
         return true;
     }
     catch (std::exception &e)
@@ -261,6 +258,13 @@ bool WriteXlsxTest()
         return false;
     }
 }
+#else
+bool WriteXlsxTest()
+{
+    Timer t("WriteXlsxTest");
+    return true;
+}
+#endif
 bool SortTest()
 {
     try
