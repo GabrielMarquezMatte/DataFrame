@@ -1,0 +1,39 @@
+{
+    "name": "dataframes",
+    "version": "1.0.0",
+    "dependencies": [
+        {
+            "name": "boost-filesystem",
+            "version>=": "1.79.0"
+        },
+        {
+            "name": "boost-container",
+            "version>=": "1.79.0"
+        },
+        {
+            "name": "boost-unordered",
+            "version>=": "1.79.0"
+        },
+        {
+            "name": "boost-algorithm",
+            "version>=": "1.79.0"
+        },
+        {
+            "name": "boost-variant",
+            "version>=": "1.79.0"
+        },
+        {
+            "name": "boost-lexical-cast",
+            "version>=": "1.79.0"
+        },
+        {
+            "name": "boost-sort",
+            "version>=": "1.79.0"
+        },
+        {
+            "name": "xlnt",
+            "version>=": "1.5.0#4"
+        }
+    ],
+    "builtin-baseline":"6ff1bfa0595b2af4e2a39b41d5be95ee2c4777aa"
+}
