@@ -14,4 +14,4 @@ jobs:
     - name: Configure
       run: cmake . --preset="win64-msvc-vcpkg"
     - name: Build
-      run: cmake --build . --preset "win64-msvc-vcpkg-release"
+      run: cmake --build --preset "win64-msvc-vcpkg-release"
