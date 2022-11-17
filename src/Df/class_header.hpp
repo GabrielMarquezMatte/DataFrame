@@ -67,7 +67,9 @@ namespace df
         int cols = 0;
         int rows = 0;
         column_set primaryKeys = {};
-
+        #ifdef USE_BOOST
+        xlnt::workbook create_workbook();
+        #endif
     public:
         ~DataFrame();
         DataFrame();
@@ -99,7 +101,10 @@ namespace df
         #endif
         void write_csv(const std::string& path, const char &delimiter = ";");
         #ifdef USE_BOOST
+        void load_xlsx(const std::string& path);
         void write_xlsx(const std::string& path);
+        void write_xlsx(const std::string& path,const std::string& password);
+        void write_xlsx(const char* path);
         #endif
         bool operator==(const DataFrame<T...> &df);
         bool operator!=(const DataFrame<T...> &df);

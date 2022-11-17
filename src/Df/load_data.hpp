@@ -172,9 +172,8 @@ namespace df
         }
     }
 #ifdef USE_BOOST
-    template <typename... T>
-    void DataFrame<T...>::write_xlsx(const std::string &path)
-    {
+    template <typename ...T>
+    xlnt::workbook DataFrame<T...>::create_workbook(){
         xlnt::workbook wb;
         xlnt::worksheet ws = wb.active_sheet();
         int row = 1;
@@ -204,7 +203,52 @@ namespace df
             row++;
             col = 1;
         }
+        return wb;
+    }
+    template <typename... T>
+    void DataFrame<T...>::write_xlsx(const std::string &path)
+    {
+        xlnt::workbook wb = this->create_workbook();
         wb.save(path);
+    }
+    template <typename... T>
+    void DataFrame<T...>::write_xlsx(const char *path){
+        this->write_xlsx(std::string(path));
+    }
+    template <typename... T>
+    void DataFrame<T...>::write_xlsx(const std::string& path,const std::string &password){
+        xlnt::workbook wb = this->create_workbook();
+        wb->save(path,password);
+    }
+    template <typename... T>
+    void DataFrame<T...>::load_xlsx(const std::string& path){
+        xlnt::workbook wb;
+        wb.load(path);
+        xlnt::worksheet ws = wb.active_sheet();
+        xlnt::range_reference range = ws.calculate_dimension();
+        xlnt::cell_reference top_left = range.top_left();
+        xlnt::cell_reference bottom_right = range.bottom_right();
+        int row = top_left.row();
+        int col = top_left.column();
+        for (int i = col; i <= bottom_right.column(); i++)
+        {
+            std::string column = ws.cell(i, row).to_string();
+            this->data[column] = series<T...>();
+            this->columns.insert(column);
+        }
+        this->cols = this->columns.size();
+        row++;
+        for (int i = row; i <= bottom_right.row(); i++)
+        {
+            for (int j = col; j <= bottom_right.column(); j++)
+            {
+                auto it = this->columns.begin();
+                boost::advance(it, j - col);
+                std::string &column = *it;
+                this->data[column].push_back(boost::lexical_cast<boost::variant<T...>>(ws.cell(j, i).to_string()));
+            }
+            this->rows++;
+        }
     }
 #endif
 }

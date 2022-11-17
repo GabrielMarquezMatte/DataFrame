@@ -1,0 +1,17 @@
+name: CMake
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      run: cmake . --preset="win64-msvc-vcpkg"
+    - name: Build
+      run: cmake --build . --preset "win64-msvc-vcpkg-release"

@@ -101,5 +101,6 @@
         "valarray": "cpp",
         "ranges": "cpp",
         "span": "cpp"
-    }
+    },
+    "cmake.useCMakePresets": "never"
 }

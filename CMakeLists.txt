@@ -1,6 +1,5 @@
-cmake_minimum_required(VERSION 3.22.3)
+cmake_minimum_required(VERSION 3.24.3)
 project(DataFrameLib LANGUAGES CXX)
-include(D:/src/vcpkg/scripts/buildsystems/vcpkg.cmake)
 set(CMAKE_CXX_STANDARD 17)
 set(Boost_NO_WARN_NEW_VERSIONS TRUE)
 find_package(Boost 1.79.0 COMPONENTS filesystem container REQUIRED)
