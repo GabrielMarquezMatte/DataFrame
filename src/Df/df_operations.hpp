@@ -251,7 +251,7 @@ namespace df
         newDf.rows = this->rows;
         newDf.cols = this->cols;
         newDf.columns = this->columns;
-        //Sort all columns by the given column
+        // Sort all columns by the given column
         for (auto it = newDf.data.begin(); it != newDf.data.end(); it++)
         {
             vector<std::pair<value_t<T...>, int>> pairs;
@@ -281,7 +281,7 @@ namespace df
         newDf.rows = this->rows;
         newDf.cols = this->cols;
         newDf.columns = this->columns;
-        //Sort all columns by the given columns
+        // Sort all columns by the given columns
         for (auto it = newDf.data.begin(); it != newDf.data.end(); it++)
         {
             vector<std::pair<value_t<T...>, int>> pairs;
@@ -335,6 +335,47 @@ namespace df
     bool DataFrame<T...>::operator!=(const DataFrame<T...> &df)
     {
         return !(*this == df);
+    }
+    template <typename... T>
+    series<T...> DataFrame<T...>::operator[](const std::string &column)
+    {
+        return this->data.at(column);
+    }
+    template <typename... T>
+    DataFrame<T...> DataFrame<T...>::operator[](const column_set &columns)
+    {
+        DataFrame<T...> newDf;
+        for (auto it = columns.begin(); it != columns.end(); it++)
+        {
+            newDf.data[*it] = this->data.at(*it);
+        }
+        newDf.rows = this->rows;
+        newDf.cols = columns.size();
+        newDf.columns = columns;
+        return newDf;
+    }
+    template<typename ...T>
+    series<T...> DataFrame<T...>::operator[](const int &column)
+    {
+        int i = 0;
+        for (auto it = this->data.begin(); it != this->data.end(); it++)
+        {
+            if (i == column)
+            {
+                return it->second;
+            }
+            i++;
+        }
+        throw std::out_of_range("Column out of range");
+    }
+    template <typename... T>
+    DataFrame<T...> DataFrame<T...>::operator=(const DataFrame<T...> &df)
+    {
+        this->data = df.data;
+        this->rows = df.rows;
+        this->cols = df.cols;
+        this->columns = df.columns;
+        return *this;
     }
 }
 #endif

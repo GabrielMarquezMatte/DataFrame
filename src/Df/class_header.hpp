@@ -108,6 +108,10 @@ namespace df
         #endif
         bool operator==(const DataFrame<T...> &df);
         bool operator!=(const DataFrame<T...> &df);
+        series<T...> operator[](const std::string& column);
+        DataFrame<T...> operator[](const column_set& columns);
+        series<T...> operator[](const int& column);
+        DataFrame<T...> operator=(const DataFrame<T...> &df);
     };
 }
 #endif
