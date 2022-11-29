@@ -18,7 +18,7 @@ public:
     }
     ~Timer()
     {
-        auto end = std::chrono::high_resolution_clock::now();
+        end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
         std::string result = std::string(function_name.value_or("Time")) + ": " + std::to_string(duration.count()) + " microseconds\n";
         if (ptr_result)
@@ -34,6 +34,7 @@ public:
 
 private:
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
+    std::chrono::time_point<std::chrono::high_resolution_clock> end;
     std::optional<std::string_view> function_name;
     std::string *ptr_result = nullptr;
 };
@@ -339,7 +340,6 @@ int main()
 {
     std::string result_str;
     Timer t("Main");
-    std::string ss;
     // Create a vector with all the functions
     df::vector<std::function<void(bool &result,std::string& result_str)>> functions = {
         SelectTest,
@@ -364,14 +364,14 @@ int main()
     // Wait for all threads to finish
     for (int i = 0; i < functions.size(); i++)
     {
-        
+        futures[i].wait();   
     }
-    std::cout << result_str << "\n";
+    result_str +="\n";
     // Print the results
     for (int i = 0; i < functions.size(); i++)
     {
-        ss += "Test " + std::to_string(i) + " " + (results[i] ? "OK\n" : "FAIL\n");
+        result_str += "Test " + std::to_string(i) + " " + (results[i] ? "OK\n" : "FAIL\n");
     }
-    std::cout << ss << std::endl;
+    std::cout << result_str;
     return 0;
 }
