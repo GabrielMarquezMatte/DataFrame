@@ -2,8 +2,23 @@
 #define DATAFRAME_LOAD_DATA_HPP
 #include "class_header.hpp"
 #include <stdio.h>
+#ifdef USE_BOOST
+#include <boost/regex.hpp>
+#else
+#include <regex>
+#endif
 namespace df
 {
+    bool isNumber(const std::string& value){
+        if(value.empty()) return false;
+        #ifdef USE_BOOST
+        boost::regex pattern("^[-+]?[0-9]*\\.?[0-9]+$");
+        return boost::regex_match(value, pattern);
+        #else
+        std::regex pattern("^[-+]?[0-9]*\\.?[0-9]+$");
+        return std::regex_match(value, pattern);
+        #endif
+    }
     template <typename... T>
     void DataFrame<T...>::load(const data_map<T...> &data)
     {
@@ -191,13 +206,22 @@ namespace df
             for (const std::string &column : this->columns)
             {
                 value_t<T...> value = this->data[column].at(i);
-                try
+                #ifdef USE_BOOST
+                const std::string str = boost::lexical_cast<std::string>(value);
+                #else
+                const std::string str = std::to_string(value);
+                #endif
+                if(isNumber(str))
                 {
-                    ws.cell(col, row).value(boost::lexical_cast<double>(value));
+                    #ifdef USE_BOOST
+                    ws.cell(col, row).value(boost::lexical_cast<double>(str));
+                    #else
+                    ws.cell(col, row).value(std::stod(str));
+                    #endif
                 }
-                catch (const std::exception &e)
+                else
                 {
-                    ws.cell(col, row).value(boost::lexical_cast<std::string>(value));
+                    ws.cell(col, row).value(str);
                 }
                 col++;
             }
