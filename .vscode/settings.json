@@ -100,7 +100,7 @@
         "stack": "cpp",
         "valarray": "cpp",
         "ranges": "cpp",
-        "span": "cpp",
-        "regex": "cpp"
-    }
+        "span": "cpp"
+    },
+    "cmake.useCMakePresets": "never"
 }
