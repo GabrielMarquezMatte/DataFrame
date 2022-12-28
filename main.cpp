@@ -1,7 +1,7 @@
 #define USE_BOOST
 #include "Df/DataFrame.hpp"
 #include <chrono>
-#include <future>
+#include <thread>
 static const df::data_map<int64_t, std::string> BASE_DATA = {
     {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
     {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
@@ -355,16 +355,15 @@ int main()
         JoinMultiple,
         WriteCsvTest};
     df::vector<bool> results(functions.size());
-    std::vector<std::future<void>> futures(functions.size());
-    // Create a thread for each function
+    std::vector<std::thread> threads(functions.size());
+    // Run all the tests in parallel
     for (int i = 0; i < functions.size(); i++)
     {
-        futures[i] = std::async(std::launch::async, functions[i], std::ref(results[i]),std::ref(result_str));
+        threads[i] = std::thread(functions[i], std::ref(results[i]),std::ref(result_str));
     }
-    // Wait for all threads to finish
     for (int i = 0; i < functions.size(); i++)
     {
-        futures[i].wait();   
+        threads[i].join();
     }
     result_str +="\n";
     // Print the results
