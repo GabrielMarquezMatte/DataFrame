@@ -27,7 +27,6 @@ public:
         }
         else
         {
-
             std::cout << result;
         }
     }
@@ -38,11 +37,11 @@ private:
     std::optional<std::string_view> function_name;
     std::string *ptr_result = nullptr;
 };
-void SelectTest(bool &result,std::string& result_str)
+void SelectTest(bool &result, std::string &result_str)
 {
     try
     {
-        Timer t("SelectTest",result_str);
+        Timer t("SelectTest", result_str);
         df::DataFrame df = BASE_DF;
         bool teste1 = (df.getCols() == 2);
         bool teste2 = (df.getRows() == 10);
@@ -57,11 +56,11 @@ void SelectTest(bool &result,std::string& result_str)
         result = false;
     }
 }
-void ConcatTest(bool &result,std::string& result_str)
+void ConcatTest(bool &result, std::string &result_str)
 {
     try
     {
-        Timer t("ConcatTest",result_str);
+        Timer t("ConcatTest", result_str);
         df::DataFrame df = BASE_DF;
         bool teste1 = (df.getRows() == 10);
         df::data_map<int64_t, std::string> data2 = {
@@ -79,11 +78,11 @@ void ConcatTest(bool &result,std::string& result_str)
         result = false;
     }
 }
-void GetRowsAndColsTest(bool &result,std::string& result_str)
+void GetRowsAndColsTest(bool &result, std::string &result_str)
 {
     try
     {
-        Timer t("GetRowsAndColsTest",result_str);
+        Timer t("GetRowsAndColsTest", result_str);
         df::DataFrame df = BASE_DF;
         bool teste1 = (df.getRows() == 10);
         bool teste2 = (df.getCols() == 2);
@@ -95,11 +94,11 @@ void GetRowsAndColsTest(bool &result,std::string& result_str)
         result = false;
     }
 }
-void LeftJoinTest(bool &result,std::string& result_str)
+void LeftJoinTest(bool &result, std::string &result_str)
 {
     try
     {
-        Timer t("LeftJoinTest",result_str);
+        Timer t("LeftJoinTest", result_str);
         df::DataFrame df = BASE_DF;
         df::data_map<int64_t, std::string> data2 = {
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
@@ -122,11 +121,11 @@ void LeftJoinTest(bool &result,std::string& result_str)
         result = false;
     }
 }
-void JoinMultiple(bool &result,std::string& result_str)
+void JoinMultiple(bool &result, std::string &result_str)
 {
     try
     {
-        Timer t("JoinMultiple",result_str);
+        Timer t("JoinMultiple", result_str);
         df::data_map<int64_t, std::string> data = {
             {"id1", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"id2", {11, 12, 13, 14, 15, 16, 17, 18, 19, 20}},
@@ -155,11 +154,11 @@ void JoinMultiple(bool &result,std::string& result_str)
         result = false;
     }
 }
-void JoinNA(bool &result,std::string& result_str)
+void JoinNA(bool &result, std::string &result_str)
 {
     try
     {
-        Timer t("JoinNA",result_str);
+        Timer t("JoinNA", result_str);
         df::DataFrame df = BASE_DF;
         df::data_map<int64_t, std::string> data2 = {
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9}},
@@ -182,11 +181,11 @@ void JoinNA(bool &result,std::string& result_str)
         result = false;
     }
 }
-void FindTest(bool &result,std::string& result_str)
+void FindTest(bool &result, std::string &result_str)
 {
     try
     {
-        Timer t("FindTest",result_str);
+        Timer t("FindTest", result_str);
         df::DataFrame df = BASE_DF;
         bool teste1 = (df.getCols() == 2);
         bool teste2 = (df.getRows() == 10);
@@ -201,14 +200,13 @@ void FindTest(bool &result,std::string& result_str)
         result = false;
     }
 }
-void WriteCsvTest(bool &result,std::string& result_str)
+void WriteCsvTest(bool &result, std::string &result_str)
 {
     try
     {
-        Timer t("WriteCsvTest",result_str);
+        Timer t("WriteCsvTest", result_str);
         df::DataFrame df = BASE_DF;
         {
-            Timer t1("W,result_strritting");
             df.write_csv(std::string("teste.csv"), ';');
         }
         df::DataFrame<int64_t, std::string> df2;
@@ -231,11 +229,11 @@ void WriteCsvTest(bool &result,std::string& result_str)
         result = false;
     }
 }
-void LoadTest(bool &result,std::string& result_str)
+void LoadTest(bool &result, std::string &result_str)
 {
     try
     {
-        Timer t("LoadTest",result_str);
+        Timer t("LoadTest", result_str);
         df::data_map<int64_t, std::string> data = {
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
@@ -252,11 +250,11 @@ void LoadTest(bool &result,std::string& result_str)
     }
 }
 #ifdef USE_BOOST
-void WriteXlsxTest(bool &result,std::string& result_str)
+void WriteXlsxTest(bool &result, std::string &result_str)
 {
     try
     {
-        Timer t("WriteXlsxTest",result_str);
+        Timer t("WriteXlsxTest", result_str);
         df::data_map<std::string, double> data = {
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}},
@@ -275,17 +273,17 @@ void WriteXlsxTest(bool &result,std::string& result_str)
     }
 }
 #else
-void WriteXlsxTest(bool &result,std::string& result_str)
+void WriteXlsxTest(bool &result, std::string &result_str)
 {
-    Timer t("WriteXlsxTest",result_str);
+    Timer t("WriteXlsxTest", result_str);
     result = true;
 }
 #endif
-void SortTest(bool &result,std::string& result_str)
+void SortTest(bool &result, std::string &result_str)
 {
     try
     {
-        Timer t("SortTest",result_str);
+        Timer t("SortTest", result_str);
         df::data_map<int64_t, std::string> data = {
             {"id", {1, 4, 2, 5, 3, 6, 7, 8, 9, 10}},
             {"age", {10, 40, 20, 50, 30, 60, 70, 80, 90, 100}}};
@@ -312,11 +310,11 @@ void SortTest(bool &result,std::string& result_str)
         result = false;
     }
 }
-void ConcatMultiple(bool &result,std::string& result_str)
+void ConcatMultiple(bool &result, std::string &result_str)
 {
     try
     {
-        Timer t("ConcatMultiple",result_str);
+        Timer t("ConcatMultiple", result_str);
         df::data_map<int64_t, std::string> data = {
             {"id", {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
             {"age", {10, 20, 30, 40, 50, 60, 70, 80, 90, 100}}};
@@ -341,7 +339,7 @@ int main()
     std::string result_str;
     Timer t("Main");
     // Create a vector with all the functions
-    df::vector<std::function<void(bool &result,std::string& result_str)>> functions = {
+    df::vector<std::function<void(bool &result, std::string &result_str)>> functions = {
         SelectTest,
         ConcatTest,
         LoadTest,
@@ -359,13 +357,13 @@ int main()
     // Run all the tests in parallel
     for (int i = 0; i < functions.size(); i++)
     {
-        threads[i] = std::thread(functions[i], std::ref(results[i]),std::ref(result_str));
+        threads[i] = std::thread(functions[i], std::ref(results[i]), std::ref(result_str));
     }
     for (int i = 0; i < functions.size(); i++)
     {
         threads[i].join();
     }
-    result_str +="\n";
+    result_str += "\n";
     // Print the results
     for (int i = 0; i < functions.size(); i++)
     {
